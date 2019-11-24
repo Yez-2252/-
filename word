@@ -1,0 +1,190 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.TreeMap;
+class expression{
+    char ex;
+    double a;
+    String b;
+    expression()
+    {
+        ex=0;
+        a=0;
+        b=null;
+    }
+}
+class word{
+    String name;
+    int num;
+    word()
+    {
+        name=null;
+        num=-1;
+    }
+}
+public class Main {
+    public static void findword(String text) throws IOException{
+        @SuppressWarnings("resource")
+        Scanner scan=new Scanner(System.in);
+        int i=0;
+        String[] array = {".",",","?","!"};
+        for (int i1 = 0; i1 < array.length; i1++) {
+            text = text.replace(array[i1]," ");
+        }
+        String[] textArray = text.split(" ");
+        Map<String, Integer> map = new TreeMap<String, Integer>();
+        for (int i1 = 0; i1 < textArray.length; i1++) {
+            String key = textArray[i1];
+            //转为小写
+            String key_l = key.toLowerCase();
+            if(!"".equals(key_l)){
+                Integer num = map.get(key_l);
+                if(num == null || num == 0){
+                    map.put(key_l, 1);
+                }
+                else if(num > 0){
+                    map.put(key_l, num+1);
+                }
+            }
+        }
+        for(@SuppressWarnings("unused") String e:map.keySet()){
+            // System.out.println("单词："+e+" 次数："+map.get(e));
+            i++;
+        }
+        dc [] z=new dc[i];
+        for(int m=0;m<=i-1;m++) {
+            z[m]=new dc();
+        }
+        int j=0;
+        for(String e:map.keySet()) {
+//            if(z[j]!=null) {
+//                z[j].name=e;
+//                z[j].num=map.get(e);
+//            }
+            if(z[j]!=null&&!nousejudge(e,"nouse.txt")) {
+                z[j].name=e;
+                z[j].num=map.get(e);
+            }
+            j++;
+        }
+        dc t=new dc();
+        for(int m=0;m<=i-1;m++)
+        {
+            for(int n=m;n<=i-1;n++) {
+                if(z[m]!=null&&(z[m].num<z[n].num)) {
+                    t=z[m];
+                    z[m]=z[n];
+                    z[n]=t;
+                }
+            }
+        }
+        for(int p=0;p<=i-1;p++) {
+            System.out.println("单词："+z[p].name+" 次数："+z[p].num);
+        }
+        System.out.println("请输入想要输出前几位次数较多的单词：");
+        int b=scan.nextInt();
+        for(int m=0;m<=b-1;m++) {
+            if(z[m]!=null) {
+                System.out.println("单词："+z[m].name+" 次数："+z[m].num);
+            }
+        }
+    }
+    public static void judgezimu(String str1)
+    {
+        char zm[]=new char[26];
+        int ci[]=new int[26];
+        DecimalFormat df = new DecimalFormat("0.00");
+        double sum=0;
+        int i;
+        int flag=0;
+        String str=str1.toLowerCase();
+        int count;
+        char chs[]=str.toCharArray();
+        for(char ch='a';ch<='z';ch++)
+        {
+            
+            count=0;//计数器
+            for(i=0;i<chs.length;i++)
+            {
+                if(ch==chs[i])
+                    count++;
+            }
+            if(count!=0) {
+                zm[flag]=ch;
+                ci[flag]=count;
+                sum=sum+count;
+                flag++;
+            }
+        }
+        zimu z[]=new zimu[flag];
+        for(int m=0;m<flag;m++) {
+            z[m]=new zimu();
+        }
+        for(i=0;i<flag;i++)
+        {
+            z[i].zm=zm[i];
+            z[i].ci=ci[i];
+            z[i].pl=df.format(ci[i]/sum);
+        }
+        zimu t=new zimu();
+        for(i=0;i<flag;i++)
+        {
+            for(int j=0;j<flag;j++)
+            {
+                if(z[i].ci>z[j].ci)
+                {
+                    t=z[i];
+                    z[i]=z[j];
+                    z[j]=t;
+                }
+            }
+        }
+        for(i=0;i<flag;i++)
+        {
+            System.out.println(z[i].zm+"：次数："+z[i].ci+"频率："+z[i].pl);
+        }
+    }
+    public static String readtxt(String txt) throws IOException
+    {
+        File file = new File(txt);//定义一个file对象，用来初始化FileReader
+        FileReader reader = null;
+        try {
+            reader = new FileReader(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        BufferedReader bReader = new BufferedReader(reader);//new一个BufferedReader对象，将文件内容读取到缓存
+        StringBuilder sb = new StringBuilder();//定义一个字符串缓存，将字符串存放缓存中
+        String s = "";
+        while ((s =bReader.readLine()) != null) {
+        sb.append(s);//将读取的字符串添加换行符后累加p存放在缓存中
+        }
+        bReader.close();
+        String str = sb.toString();
+        return str;
+    }
+    public static boolean nousejudge(String danci,String txt) throws IOException {
+        String str=readtxt(txt);
+        String[] nouse = str.split(" ");
+        for(int i=0;i<nouse.length;i++)
+        {
+            if(danci.equals(nouse[i]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public static void main(String[] args) throws IOException {
+        // TODO Auto-generated method stub
+        //String str = readtxt("zimu.txt");
+        //judgezimu(str);
+        String str1 = readtxt("danci.txt");
+        findword(str1);
+    }
+}
